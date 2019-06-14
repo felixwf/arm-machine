@@ -12,7 +12,7 @@
   ----------------------------------------------------------------------------*/
 #include "watchdog_app.h"
 #include "bsp_usart.h"
-/*
+/* 
 	使用方法：
 	1. 初始化，时间根据自己需要，这里的时间为200ms，直接在函数中更改。
 	2. 在任意需要的Task中，喂狗IWDG_Feed()
@@ -38,14 +38,13 @@ void WatchDog_App_Task(void *pvParameters);
 返 回 值 ： 无
 作    者 ： FelixWu
 *************************************************/
-void WatchDog_App_Init(void)
+void WatchDog_App_Init(void) 
 {
     BaseType_t xReturn;
     IWDG_Init();
     xReturn = xTaskCreate(WatchDog_App_Task, "WatchDog_App_Task", WATCHDOG_STACK_SIZE, NULL, WATCHDOG_TASK_PRIORITY, &WATCHDOG_App_Task_Handler);
     if(pdPASS != xReturn)
     {
-		printf("WatchDog_App created failed");
         return;                                      //创建接收任务失败
     }
 }
@@ -60,13 +59,13 @@ void WatchDog_App_Init(void)
 *************************************************/
 static void WatchDog_App_Task(void *pvParameters)
 {
-    IWDG_Init();
+		IWDG_Init();
     for(;;)
     {
-        /* feed the dog every 10ms */
-        vTaskDelay(100);
-        printf("Feed the dog");
-        IWDG_Feed();
+			/* feed the dog every 10ms */
+			vTaskDelay(10);
+			printf("Feed the dog");
+			IWDG_Feed();
     }
 }
 
@@ -80,11 +79,11 @@ void IWDG_Init(void)
     /* Enable the IWDG write */
     IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
 
-    /*
-     * 40K/256 	= 	156Hz(6.4ms)
+    /* 
+	 * 40K/256 	= 	156Hz(6.4ms)
      * 40K/8 	=	5KHz(0.2ms)
-     */
-    IWDG_SetPrescaler(IWDG_Prescaler_128);  // should be 8
+	 */
+    IWDG_SetPrescaler(IWDG_Prescaler_8);
 
     /* 1000x0.2 = 200ms, the param value should be < 0xfff */
     IWDG_SetReload(1000);
@@ -99,7 +98,7 @@ void IWDG_Init(void)
 
 
 /* 喂狗： Feed the IWDG */
-void IWDG_Feed(void)
+void IWDG_Feed(void) 
 {
     IWDG_ReloadCounter();
 }

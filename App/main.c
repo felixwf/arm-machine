@@ -14,8 +14,6 @@
 #include "FreeRTOS.h"
 #include "bsp.h"
 #include "app.h"
-#include "sys.h"
-#include "delay.h"
 
 //任务优先级
 #define START_TASK_PRIO		1
@@ -51,7 +49,6 @@ int main(void)
 {
     /* 1、SYS初始化 */
     SysInit();
-    delay_init();
 
     /* 2、创建开始任务 */
     xTaskCreate((TaskFunction_t )start_task,            //任务函数
@@ -82,7 +79,7 @@ void start_task(void *pvParameters)
     taskENTER_CRITICAL();
 
     /* 延时启动 */
-    vTaskDelay(1000);
+//    vTaskDelay(1000);
 
     /* 创建其他任务 */
     AppTaskCreate();

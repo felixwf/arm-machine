@@ -67,12 +67,12 @@ void AppTaskCreate(void)
 *************************************************/
 static void APP_Init(void)
 {
-//	printf("APP_Init()\r\n");
-//    Nvidiacom_App_Init();
-		Led_App_Init();
-		WatchDog_App_Init();
-//		RunTimeStatsTaskCreate();
-		USART_Cmd(NVIDIA_COM, ENABLE);  
+	printf("APP_Init()\r\n");
+    Nvidiacom_App_Init();
+    Led_App_Init();
+    WatchDog_App_Init();
+		RunTimeStatsTaskCreate();
+    USART_Cmd(NVIDIA_COM, ENABLE);
 }
 
 /************************************************
@@ -86,7 +86,7 @@ static void APP_Task(void *pvParameters)
 {
     BSP_Init();                                    //底层驱动初始化
     APP_Init();                                    //应用程序初始化
-	
+
     for(;;)
     {
         vTaskDelay(100);
@@ -215,10 +215,10 @@ void RunTimeStats_task(void *pvParameters)
 //        printf("%s\r\n",RunTimeInfo);
 
 //		memset(RunTimeInfo,0,1600);				//信息缓冲区清零
-		vTaskGetRunTimeStats(RunTimeInfo);		//获取任务运行时间信息
-		printf("Name\t\t\tTime\tPercent\r\n");
-		printf("Name\t\tState\tPrior\tStack\tNum\r\n");
-		printf("%s\r\n",RunTimeInfo);
+        vTaskGetRunTimeStats(RunTimeInfo);		//获取任务运行时间信息
+        printf("Name\t\t\tTime\tPercent\r\n");
+        printf("Name\t\tState\tPrior\tStack\tNum\r\n");
+        printf("%s\r\n",RunTimeInfo);
         vTaskDelay(2000);                           	//延时10ms，也就是1000个时钟节拍
 
 //		TaskStatus_t TaskStatus;

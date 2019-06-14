@@ -49,10 +49,6 @@ void LED_Initializes(void)
 *************************************************/
 void BSP_Init(void)
 {
-  LED_Initializes();                             //LED底层初始化
-
-//  CAN_Initializes();                             //CAN底层初始化
-  TIM_Initializes();                             //TIM底层初始化
   USART_Initializes();                           //USART底层初始化
 }
 

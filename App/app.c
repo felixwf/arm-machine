@@ -17,8 +17,8 @@
 #include "bsp_timer.h"
 #include "task.h"
 
-#include "nvidiacom_app.h"
-#include "nvidiacom_drv.h"
+#include "pccom_app.h"
+#include "pccom_drv.h"
 #include "watchdog_app.h"
 #include "led_app.h"
 
@@ -27,7 +27,7 @@ static void APP_Init(void);
 static void APP_Task(void *pvParameters);
 
 //任务优先级
-#define RUNTIMESTATS_TASK_PRIO	4
+#define RUNTIMESTATS_TASK_PRIO	2
 //任务堆栈大小
 #define RUNTIMESTATS_STK_SIZE 	128
 //任务句柄
@@ -35,7 +35,7 @@ TaskHandle_t RunTimeStats_App_Task_Handler;
 //任务函数
 void RunTimeStats_task(void *pvParameters);
 
-char RunTimeInfo[1600];		//保存任务运行时间信息
+char RunTimeInfo[400];		//保存任务运行时间信息
 
 
 /************************************************
@@ -67,12 +67,12 @@ void AppTaskCreate(void)
 *************************************************/
 static void APP_Init(void)
 {
-//	printf("APP_Init()\r\n");
-//    Nvidiacom_App_Init();
+    printf("APP_Init()\r\n");
+    PCcom_App_Init();
     Led_App_Init();
     WatchDog_App_Init();
-//		RunTimeStatsTaskCreate();
-    USART_Cmd(NVIDIA_COM, ENABLE);
+    RunTimeStatsTaskCreate();
+    USART_Cmd(PC_COM, ENABLE);
 }
 
 /************************************************
@@ -84,13 +84,15 @@ static void APP_Init(void)
 *************************************************/
 static void APP_Task(void *pvParameters)
 {
+    taskENTER_CRITICAL();
     BSP_Init();                                    //底层驱动初始化
     APP_Init();                                    //应用程序初始化
+    taskEXIT_CRITICAL();
 
     for(;;)
     {
+		printf("APP_Task()");
         vTaskDelay(100);
-//        LED_TOGGLE();                                //LED闪烁
     }
 }
 

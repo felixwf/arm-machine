@@ -26,8 +26,8 @@
 #include "bsp_can.h"
 #include "bsp_usart.h"
 #include "bsp_timer.h"
-#include "nvidiacom_drv.h"
-#include "global_var.h"
+#include "pccom_drv.h"
+
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -165,36 +165,37 @@ void DEBUG_COM_IRQHandler(void)
 }
 
 /************************************************
-函数名称 ： NVIDIA_COM_IRQHandler
+函数名称 ： PC_COM_IRQHandler
 功    能 ： USARTx中断(通讯)
 参    数 ： 无
 返 回 值 ： 无
 作    者 ： FelixWu
 *************************************************/
-void NVIDIA_COM_IRQHandler(void)
+void PC_COM_IRQHandler(void)
 {
 //	u8 Res;
-    BaseType_t xHigherPriorityTaskWoken = pdTRUE;
+//    BaseType_t xHigherPriorityTaskWoken = pdTRUE;
 
 
-    if(USART_GetITStatus(NVIDIA_COM, USART_IT_RXNE) != RESET)
+    if(USART_GetITStatus(PC_COM, USART_IT_RXNE) != RESET)
     {
         /* START --- 添加在这里的内容，是为了保证清除了标志 */
-        USART_ClearITPendingBit(NVIDIA_COM, USART_IT_RXNE);
+        USART_ClearITPendingBit(PC_COM, USART_IT_RXNE);
         /* END ---- 添加在这里的内容，是为了保证清除了标志 */
 
-        NVIDIA_COM_RX_BUF[NVIDIA_COM_RX_STA++] = USART_ReceiveData(NVIDIA_COM);
+        PC_COM_RX_BUF[PC_COM_RX_STA++] = USART_ReceiveData(PC_COM);
     }
-    else if(USART_GetITStatus(NVIDIA_COM, USART_IT_IDLE) != RESET)	// 如果接收到完整的一帧数据
+    else if(USART_GetITStatus(PC_COM, USART_IT_IDLE) != RESET)	// 如果接收到完整的一帧数据
     {
-        USART_ReceiveData(NVIDIA_COM);
-        NVIDIA_COM_RX_STA=0;
-        USART_ClearITPendingBit(NVIDIA_COM,USART_IT_IDLE);
+        USART_ReceiveData(PC_COM);
+        PC_COM_RX_STA=0;
+        USART_ClearITPendingBit(PC_COM,USART_IT_IDLE);
 
+		printf("pccom received");
         /* Notify battery更新task */
-        uint8_t command_code = NVIDIA_COM_RX_BUF[2];
-        for(int i = 0 ; i < NVIDIA_COM_REC_LEN; i ++)
-            NVIDIA_COM_RX_BUF_BACKUP[i] = NVIDIA_COM_RX_BUF[i];
+        uint8_t command_code = PC_COM_RX_BUF[2];
+        for(int i = 0 ; i < PC_COM_REC_LEN; i ++)
+            PC_COM_RX_BUF_BACKUP[i] = PC_COM_RX_BUF[i];
         switch(command_code)// 根据串口收到的不同的指令代码，进行不同的操作。
         {
         case 0x00:
@@ -204,79 +205,29 @@ void NVIDIA_COM_IRQHandler(void)
 //            }
             break;
         case 0x01:
-            /* 接收速度指令，解析，并发送《速度控制》任务通知 */
-//				printf("0x01\r\n");
-//								printf("count = %d\r\n", count++);
-//            if(CANOpen_App_Task_Handler!=NULL) {
-//                xTaskNotifyFromISR(CANOpen_App_Task_Handler, 1, (eNotifyAction) eSetValueWithOverwrite,&xHigherPriorityTaskWoken);//发送任务通知
-//                /* 接收到速度指令，发出通知后，立刻清除定时器，否则定时器会发送停止命令 */
-//                xTimerResetFromISR(AutoReloadTimer_Handle, &xHigherPriorityTaskWoken);
-//                portYIELD_FROM_ISR(xHigherPriorityTaskWoken);//如果需要的话进行一次任务切换
-//            }
             break;
         case 0x02:
-            /* 接收升降电机控制指令，解析，并发送《升降电机控制》任务通知 */
-//				printf("0x02\r\n");
-            switch(NVIDIA_COM_RX_BUF[3])
-            {
-            case 0x00:
-                LIFTER_TARGET_STATUS = 0x00;
-                break;
-
-            case 0x10:
-                LIFTER_TARGET_STATUS = 0x10;
-                break;
-
-            case 0x01:
-                LIFTER_TARGET_STATUS = 0x01;
-                break;
-
-            case 0x11:
-                LIFTER_TARGET_STATUS = 0x11;
-                break;
-
-            }
-//					if(CANOpen_App_Task_Handler!=NULL){
-//						xTaskNotifyFromISR(CANOpen_App_Task_Handler, 2, (eNotifyAction) eSetValueWithOverwrite,&xHigherPriorityTaskWoken);//发送任务通知
-//						portYIELD_FROM_ISR(xHigherPriorityTaskWoken);//如果需要的话进行一次任务切换
-//					}
             break;
         case 0x03:
-//            if(CANOpen_App_Task_Handler!=NULL) {
-//                xTaskNotifyFromISR(CANOpen_App_Task_Handler, 3, (eNotifyAction) eSetValueWithOverwrite,&xHigherPriorityTaskWoken);//发送任务通知
-//                portYIELD_FROM_ISR(xHigherPriorityTaskWoken);//如果需要的话进行一次任务切换
-//            }
             break;
         case 0x04:
-            /* 接收驱动器出错清零指令，解析，并发送《驱动器复位》任务通知 */
-//            if(CANOpen_App_Task_Handler!=NULL) {
-//                xTaskNotifyFromISR(CANOpen_App_Task_Handler, 4, (eNotifyAction) eSetValueWithOverwrite,&xHigherPriorityTaskWoken);//发送任务通知
-//                portYIELD_FROM_ISR(xHigherPriorityTaskWoken);//如果需要的话进行一次任务切换
-//            }
             break;
         case 0x05:
-            /* 接收上传AGV状态指令，解析，并发送《驱动器复位》任务通知 */
-//					printf("nvidia com reveived 0x05\r\n");
-//					if(StatusManager_App_Task_Handler!=NULL){
-//						xTaskNotifyFromISR(StatusManager_App_Task_Handler, 1, (eNotifyAction) eSetValueWithOverwrite,&xHigherPriorityTaskWoken);//发送任务通知
-//						portYIELD_FROM_ISR(xHigherPriorityTaskWoken);//如果需要的话进行一次任务切换
-//					}
             break;
 
         default:
             break;
         }
 
-//		portYIELD_FROM_ISR(xHigherPriorityTaskWoken);//如果需要的话进行一次任务切换
 
     }
 
     /* START --- 添加在这里的内容，是为了保证清除了标志 */
     //发的地方清标志
-    if(USART_GetFlagStatus(NVIDIA_COM,USART_FLAG_ORE) == SET)
+    if(USART_GetFlagStatus(PC_COM,USART_FLAG_ORE) == SET)
     {
-        USART_ClearFlag(NVIDIA_COM,USART_FLAG_ORE);
-        USART_ReceiveData(NVIDIA_COM);
+        USART_ClearFlag(PC_COM,USART_FLAG_ORE);
+        USART_ReceiveData(PC_COM);
     }
     /* END ---- 添加在这里的内容，是为了保证清除了标志 */
 }

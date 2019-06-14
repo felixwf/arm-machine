@@ -28,7 +28,7 @@
      - canbus
      - canopen
      - lifter
-     - nvidiacom
+     - pccom
      - safetymanager
      - statusmanager
    - Bsp (basic driver for different part, such as can, usart, timer and so on.)
