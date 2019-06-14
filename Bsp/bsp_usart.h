@@ -35,6 +35,8 @@
 /* º¯ÊýÉêÃ÷ ------------------------------------------------------------------*/
 void DEBUG_SendByte(uint8_t Data);
 void DEBUG_SendNByte(uint8_t *pData, uint16_t Length);
+void USART_SendByte(USART_TypeDef *USARTx, uint8_t Data);
+void USART_SendNByte(USART_TypeDef *USARTx, uint8_t *pData, uint16_t Length);
 
 void USART_Initializes(void);
 

@@ -141,4 +141,37 @@ void USART_Initializes(void)
 }
 
 
+
+/************************************************
+函数名称 ： USART_SendByte
+功    能 ： 调试串口发送一个字节
+参    数 ： Data --- 数据
+返 回 值 ： 无
+作    者 ： Felix Wu
+*************************************************/
+void USART_SendByte(USART_TypeDef *USARTx, uint8_t Data)
+{
+    /* 等待发送为空 */
+    while(RESET == USART_GetFlagStatus(USARTx, USART_FLAG_TXE));
+    USART_SendData(USARTx, Data);
+}
+
+/************************************************
+函数名称 ： USART_SendNByte
+功    能 ： 调试串口发送N个字节
+参    数 ： pData ---- 数据
+            Length --- 长度
+返 回 值 ： 无
+作    者 ： Felix Wu
+*************************************************/
+void USART_SendNByte(USART_TypeDef *USARTx, uint8_t *pData, uint16_t Length)
+{
+    while(Length--)
+    {
+        USART_SendByte(USARTx, *pData);
+        pData++;
+    }
+}
+
+
 /**** Copyright (C)2018 Felix Wu. All Rights Reserved **** END OF FILE ****/

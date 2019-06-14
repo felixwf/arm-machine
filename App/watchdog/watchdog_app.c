@@ -65,7 +65,7 @@ static void WatchDog_App_Task(void *pvParameters)
     {
         /* feed the dog every 10ms */
         vTaskDelay(100);
-        printf("Feed the dog");
+//        printf("Feed the dog");
         IWDG_Feed();
     }
 }

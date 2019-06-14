@@ -52,7 +52,7 @@ static void Led_App_Task(void *pvParameters)
     {
         LED1_TOGGLE();
         LED2_TOGGLE();
-		printf("Led_App_Task()");
+//		printf("Led_App_Task()");
         vTaskDelay(50);
     }
 }
