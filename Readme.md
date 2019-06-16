@@ -7,53 +7,44 @@
 - ARM CPU: ARM cortex-M3, STM32F103ZET6
 - ARM OS: FreeRTOS V10.1.1
 
+------
+
+PC to Control board:
+
+- serial port, 115200, TTL
+
+Control board to stepper:
+
+- RS485, Modbus RTU, 115200
+
+------
+
+data format:
+
+|header|mode|msg|CRC-16|end|
+|---|---|---|---|---|
+|0x55, 0xaa|0x00(0x01, 0x02, 0x03)|[4bytes] [4bytes]|[2bytes]|0x0d, 0x0a|
+
+mode:
+
+|mode code|usage|
+|---|---|
+|0x00|(x,y) mode, send the x,y and the arm-machine will move to that position|
+|0x01|(theta, distance) mode, send the theta,distance and the arm-machine will move to that position|
+|0x02|drop down and lift up|
+|0x03|activate and deactivate sucker apparatus|
 
 
-1. Entry
+msg:
 
-   Double click the following file and open the project in Keil.
+|msg|usage||
+|---|---|---|
+|8 bytes|mode 0|(x, y), x is the first 4 bytes, y is the second 4 bytes|
+||mode 1|(theta, distance), same as above|
+||mode 2|0x01: lift down, 0x0f: lift up|
+||mode 3|0x01: activate, 0x0f: deactivate|
 
-   ```
-   Project/Demo.uvprojx
-   ```
+CRC-16:
 
-2. Introduction
+from byte0 to the byte before CRC
 
-   The project contains several folders, in Explorer.
-
-   - App (contains all the user-defined apps, which will be used in OS)
-     - battery
-     - bumper
-     - button
-     - canbus
-     - canopen
-     - lifter
-     - pccom
-     - safetymanager
-     - statusmanager
-   - Bsp (basic driver for different part, such as can, usart, timer and so on.)
-   - CANOpen (CANOpen library)
-     - inc
-       - stm32
-     - src
-   - Doc (Readme and record for file changes)
-   - FreeRTOS (FreeRTOS library)
-     - include
-     - portable
-       - IAR
-         - ARM_CM0
-         - ARM_CM3
-         - ARM_CM4F
-         - ARM_CM4F_MPU
-         - ARM_CM7
-       - MemMang
-       - RVDS
-   - Libraries (Libraries about the ARM core)
-     - CMSIS
-       - CoreSupport
-       - DeviceSupport
-         - startup
-     - STM32F10x_StdPeriph_Driver
-       - inc
-       - src
-   - Project (Project file for Keil, entry of project)
