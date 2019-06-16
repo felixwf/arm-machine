@@ -33,6 +33,8 @@ mode:
 |0x01|(theta, distance) mode, send the theta,distance and the arm-machine will move to that position|
 |0x02|drop down and lift up|
 |0x03|activate and deactivate sucker apparatus|
+|0x04|auto (x, y) mode, send the target position and the arm machine will finish the whole movement|
+|0x05|auto (theta, distance) mode, send the target position and the arm machine will finish the whole movement|
 
 
 msg:
